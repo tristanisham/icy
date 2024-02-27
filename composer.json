@@ -3,6 +3,8 @@
     "description": "A static analysis tool for PHP focused on developer experience",
     "type": "project",
     "license": "MIT",
+    "bin-dir": "./src",
+    "bin": ["./src/main.php"],
     "autoload": {
         "psr-4": {
             "Ham\\Icy\\": "src/"
@@ -19,6 +21,9 @@
     },
     "scripts": {
         "icy": "php src/main.php",
-        "build": "php -d phar.readonly=0 build.php"
+        "build": "php -d phar.readonly=off /home/tristan/Development/icy/vendor/bin/phar-composer build ."
+    },
+    "require-dev": {
+        "clue/phar-composer": "^1.4"
     }
 }
