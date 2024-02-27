@@ -1,12 +1,13 @@
+#!/usr/bin/env php
 <?php declare(strict_types=1);
 use PhpParser\PhpVersion;
 
-require_once("lib/lib.php");
+require_once("depmap.php");
 
 if (php_sapi_name() === "cli") {
     for ($i = 0; $i < $argc; $i++) {
         $input = $argv[$i];
-        $dmap = new Icy\DepMap();
+        $dmap = new Ham\Icy\DepMap();
 
         switch ($input) {
             case "version":
@@ -33,7 +34,7 @@ if (php_sapi_name() === "cli") {
                     }
 
                     $dmap->map();
-                } catch (InvalidArgumentException $err) {
+                } catch (InvalidArgumentException|Exception $err) {
                     echo $err->getMessage() . "\n";
                     die(1);
                 }
