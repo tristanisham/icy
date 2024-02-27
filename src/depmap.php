@@ -104,6 +104,7 @@ final class DepMap
 
                 if ($this->outputType === DepMapOutput::JSON) {
                     $encoding = json_encode($ast, JSON_PRETTY_PRINT);
+                    // TODO: filter our imports, and append to import map with current $path as key.
                     echo $encoding;
                 }
 
