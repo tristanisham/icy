@@ -1,16 +1,18 @@
 # Icy
 
-Icy is a command line tool for statically analysing PHP projects. So far, it'll only generate an import map of PHP files
-in any given directory or individually specified files.
+Icy is a command line tool for statically analysing PHP projects. While many projects focus on the performance of your code, Icy focuses on the developer experience. 
 
 ## Usage
 
+### Import Map
+Collect the imports and their type of every PHP file in your project. 
+
 ```shell
-php src/main.php <your projects directory>
+php src/main.php <your project's directory>
 ```
 
 ### Version
 
 ```shell
-php src/main.php version
+php src/main.php --version
 ```
