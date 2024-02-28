@@ -1,4 +1,4 @@
-# Icy (I see) $ver
+# Icy (I see)
 
 Icy is a PHP static analyzer designed to prioritize developer experience.
 It is very pre-alpha software, so integrate at your own risk. That being said,
