@@ -10,7 +10,7 @@ if (isset($GLOBALS['_composer_autoload_path'])) {
 
     unset($GLOBALS['_composer_autoload_path']);
 } else {
-    foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) {
+    foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php', "~/.config/composer/vendor/autoload.php") as $file) {
         if (file_exists($file)) {
             define('ICY_COMPOSER_INSTALL', $file);
 
@@ -32,7 +32,7 @@ if (!defined('ICY_COMPOSER_INSTALL')) {
     die(1);
 }
 
-require_once ICY_COMPOSER_INSTALL;
+require ICY_COMPOSER_INSTALL;
 
 const VERSION = "v0.0.1";
 
