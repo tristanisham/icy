@@ -10,7 +10,7 @@ if (isset($GLOBALS['_composer_autoload_path'])) {
 
     unset($GLOBALS['_composer_autoload_path']);
 } else {
-    foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php', $_ENV["HOME"] . "/.config/composer/vendor/autoload.php", $_ENV["HOME"] . "/.composer/vendor/autoload.php") as $file) {
+    foreach (array(__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php', getenv("HOME") ?? "~" . "/.config/composer/vendor/autoload.php", getenv("HOME") ?? "~" . "/.composer/vendor/autoload.php") as $file) {
         if (file_exists($file)) {
             define('ICY_COMPOSER_INSTALL', $file);
 

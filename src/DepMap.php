@@ -5,7 +5,9 @@ namespace Tristan\Icy;
 use Exception;
 use InvalidArgumentException;
 
-require_once(__DIR__ . "/../vendor/autoload.php");
+
+require_once ICY_COMPOSER_INSTALL;
+
 require_once(__DIR__ . "/DepMapOutput.php");
 
 use PhpParser\Error;
