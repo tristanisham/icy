@@ -3,7 +3,6 @@
     "description": "A static analysis tool for PHP focused on developer experience",
     "type": "project",
     "license": "MIT",
-    "bin-dir": "./src",
     "bin": [
         "./src/main.php"
     ],

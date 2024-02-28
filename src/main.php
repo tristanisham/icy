@@ -3,7 +3,7 @@
 
 use PhpParser\PhpVersion;
 
-require_once("depmap.php");
+require_once("DepMap.php");
 
 if (php_sapi_name() === "cli") {
     for ($i = 0; $i < $argc; $i++) {

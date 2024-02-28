@@ -2,6 +2,7 @@
 
 namespace Ham\Icy;
 
+use InvalidArgumentException;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
@@ -12,12 +13,6 @@ use PhpParser\Node;
 use PhpParser\NodeDumper;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
-
-enum DepMapOutput
-{
-    case JSON;
-    case PHP;
-}
 
 /**
  * @var array<string> $targets ;
@@ -42,12 +37,12 @@ final class DepMap
 
     /**
      * @param string $path must be a directory.
-     * @throws \InvalidArgumentException if $path is not a directory.
+     * @throws InvalidArgumentException if $path is not a directory.
      */
     public function addRecursiveTargets(string $path): void
     {
         if (!is_dir($path)) {
-            throw new \InvalidArgumentException("{$path} is not a directory");
+            throw new InvalidArgumentException("{$path} is not a directory");
         }
 
         foreach (new \RecursiveDirectoryIterator($path) as $file) {
@@ -64,12 +59,12 @@ final class DepMap
 
     /**
      * @param string $path must be a file.
-     * @throws \InvalidArgumentException if $path is not a file.
+     * @throws InvalidArgumentException if $path is not a file.
      */
     public function addTarget(string $path): void
     {
         if (!file_exists($path)) {
-            throw new \InvalidArgumentException("{$path} must be an existing file");
+            throw new InvalidArgumentException("{$path} must be an existing file");
         }
 
         $absPath = realpath($path);
@@ -108,17 +103,24 @@ final class DepMap
 
                 $encoding = json_encode($ast);
                 // TODO: filter our imports, and append to import map with current $path as key.
-                $decoded = json_decode($encoding);
-                foreach ($decoded as $node) {
-                    if ($node["nodeType"] === "Stmt_Expression") {
-                        if ($node["expr"]["nodeType"] === "Expr_Include") {
-                            if ($node["expr"]["nodeType"]["expr"] === "Scalar_String") {
-                                $value = $node["expr"]["nodeType"]["expr"]["value"];
-                                $this->importMap[$path][] = $value;
+                $decoded = json_decode($encoding, true);
+                if ($decoded === false) {
+                    throw new \ErrorException("Failed to decode JSON");
+                }
+
+                self::recursveArrayIter($decoded, function ($array) use ($path) {
+                    if (isset($array['nodeType']) && $array['nodeType'] === 'Expr_Include') {
+                        // Assuming 'expr' contains the path and checking for its existence
+                        if (isset($array['expr']['value'])) {
+                            $rpath = realpath($path);
+                            $rpval = realpath($array['expr']['value']);
+                            if ($rpath && $rpval) {
+                                $this->importMap[$rpath][] = $rpval;
+
                             }
                         }
                     }
-                }
+                });
 
             } catch (Error $error) {
                 echo "Parse error: {$error->getMessage()}\n";
@@ -137,5 +139,16 @@ final class DepMap
     public function setPHPVersion(PhpVersion|null $version): void
     {
         $this->phpVersion = $version;
+    }
+
+    private static function recursveArrayIter(array $array, callable $callback)
+    {
+        foreach ($array as $value) {
+            if (is_array($value)) {
+                self::recursveArrayIter($value, $callback);
+            } else {
+                $callback($array);
+            }
+        }
     }
 }
