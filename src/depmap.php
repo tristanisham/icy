@@ -21,17 +21,21 @@ enum DepMapOutput
 
 /**
  * @var array<string> $targets ;
+ * @var array<string, array<string>> $importMap ;
  */
 final class DepMap
 {
     private array $targets;
     public DepMapOutput|null $outputType;
+    public array $importMap;
+    public string $outFilePath;
 
     public PhpVersion|null $phpVersion;
 
     public function __construct()
     {
         $this->targets = [];
+        $this->importMap = [];
         $this->outputType = null;
         $this->phpVersion = null;
     }
@@ -77,7 +81,7 @@ final class DepMap
     /**
      * @throws \Exception
      */
-    public function map(): void
+    public function map(): array|false
     {
         $parser = match ($this->phpVersion) {
             null => (new ParserFactory())->createForNewestSupportedVersion(),
@@ -102,18 +106,27 @@ final class DepMap
                     throw new \Exception("Unable to parse the AST of{$path}");
                 }
 
-                if ($this->outputType === DepMapOutput::JSON) {
-                    $encoding = json_encode($ast, JSON_PRETTY_PRINT);
-                    // TODO: filter our imports, and append to import map with current $path as key.
-                    echo $encoding;
+                $encoding = json_encode($ast);
+                // TODO: filter our imports, and append to import map with current $path as key.
+                $decoded = json_decode($encoding);
+                foreach ($decoded as $node) {
+                    if ($node["nodeType"] === "Stmt_Expression") {
+                        if ($node["expr"]["nodeType"] === "Expr_Include") {
+                            if ($node["expr"]["nodeType"]["expr"] === "Scalar_String") {
+                                $value = $node["expr"]["nodeType"]["expr"]["value"];
+                                $this->importMap[$path][] = $value;
+                            }
+                        }
+                    }
                 }
 
             } catch (Error $error) {
                 echo "Parse error: {$error->getMessage()}\n";
-                return;
+                return false;
             }
         }
 
+        return $this->importMap;
 
     }
 

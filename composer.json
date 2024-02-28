@@ -4,7 +4,9 @@
     "type": "project",
     "license": "MIT",
     "bin-dir": "./src",
-    "bin": ["./src/main.php"],
+    "bin": [
+        "./src/main.php"
+    ],
     "autoload": {
         "psr-4": {
             "Ham\\Icy\\": "src/"

@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
+
 use PhpParser\PhpVersion;
 
 require_once("depmap.php");
@@ -23,6 +24,11 @@ if (php_sapi_name() === "cli") {
                     $dmap->setPHPVersion(null);
                 }
                 break;
+            case "--outfile":
+                if (count($argv) > $i + 1) {
+                    $dmap->outFilePath = $argv[$i + 1];
+                }
+                break;
             default:
                 try {
                     if (file_exists($input)) {
@@ -33,7 +39,11 @@ if (php_sapi_name() === "cli") {
                         }
                     }
 
-                    $dmap->map();
+                    $importMap = $dmap->map();
+                    if ($dmap->outputType === \Ham\Icy\DepMapOutput::JSON) {
+                        $encoded = json_encode($importMap, JSON_PRETTY_PRINT);
+                        file_put_contents($dmap->outFilePath ?? "importMap.json", $encoded);
+                    }
                 } catch (InvalidArgumentException|Exception $err) {
                     echo $err->getMessage() . "\n";
                     die(1);
