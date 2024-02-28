@@ -6,7 +6,8 @@ use InvalidArgumentException;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-require_once("vendor/autoload.php");
+require_once(__DIR__ . "/../vendor/autoload.php");
+require_once("DepMapOutput.php");
 
 use PhpParser\Error;
 use PhpParser\Node;
