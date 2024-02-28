@@ -1,55 +1,25 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
-use PhpParser\PhpVersion;
+use Tristan\Icy\Cli\RunDepMap;
+use Symfony\Component\Console\Application;
 
 require_once(__DIR__ . "/../src/DepMap.php");
+require_once(__DIR__ . "/../vendor/autoload.php");
+const VERSION = "v0.0.1";
 
 if (php_sapi_name() === "cli") {
-    for ($i = 0; $i < $argc; $i++) {
-        $input = $argv[$i];
-        $dmap = new Tristan\Icy\DepMap();
+    // https://symfony.com/doc/current/console.html#configuring-the-command
+    $application = new Application();
+    $application->setName("Icy");
+    $application->setVersion(VERSION);
+    $application->add(new RunDepMap());
 
-        switch ($input) {
-            case "--version":
-            case "-v":
-                echo "v0.0.1" . "\n";
-                break;
 
-            case "--phpv":
-                if (count($argv) > $i + 1) {
-                    $dmap->setPHPVersion(PhpVersion::fromString($argv[$i + 1]));
-                } else {
-                    $dmap->setPHPVersion(null);
-                }
-                break;
-            case "--outfile":
-                if (count($argv) > $i + 1) {
-                    $dmap->outFilePath = $argv[$i + 1];
-                }
-                break;
-            default:
-                try {
-                    if (file_exists($input)) {
-                        if (is_dir($input)) {
-                            $dmap->addRecursiveTargets($input);
-                        } else {
-                            $dmap->addTarget($input);
-                        }
-                    }
-
-                    $importMap = $dmap->map();
-                    if ($dmap->outputType === Tristan\Icy\DepMapOutput::JSON) {
-                        $encoded = json_encode($importMap, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES);
-                        file_put_contents($dmap->outFilePath ?? "importMap.json", $encoded);
-                    }
-                } catch (InvalidArgumentException|Exception $err) {
-                    echo $err->getMessage() . "\n";
-                    die(1);
-                }
-
-                break;
-
-        }
+    try {
+        $application->run();
+    } catch (Exception $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
 }
+

@@ -1,18 +1,32 @@
-# Icy
+# Icy (I see) $ver
 
-Icy is a command line tool for statically analysing PHP projects. While many projects focus on the performance of your code, Icy focuses on the developer experience. 
+Icy is a PHP static analyzer designed to prioritize developer experience.
+It is very pre-alpha software, so integrate at your own risk. That being said,
+the developer is very open to contributions and will respond quickly.
 
-## Usage
+- https://github.com/tristanisham/icy
 
-### Import Map
-Collect the imports and their type of every PHP file in your project. 
+# Commands
 
-```shell
-php src/main.php <your project's directory>
-```
+## Usage:
 
-### Version
+command [options] [arguments]
 
-```shell
-php src/main.php --version
-```
+## Options:
+
+-h, --help Display help for the given command. When no command is given display help for the list command
+-q, --quiet Do not output any message
+-V, --version Display this application version
+--ansi|--no-ansi Force (or disable --no-ansi) ANSI output
+-n, --no-interaction Do not ask any interactive question
+-v|vv|vvv, --verbose Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+## Available commands:
+
+completion Dump the shell completion script
+help Display help for a command
+list List commands
+
+## sa
+
+sa:gen-import-map  [sa:im] generates an import map for all PHP files in a directory.

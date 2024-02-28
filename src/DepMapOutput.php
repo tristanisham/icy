@@ -6,4 +6,5 @@ enum DepMapOutput
 {
     case JSON;
     case PHP;
+    case STDOUT;
 }

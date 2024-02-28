@@ -2,18 +2,16 @@
 
 namespace Tristan\Icy;
 
+use Exception;
 use InvalidArgumentException;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitorAbstract;
 
 require_once(__DIR__ . "/../vendor/autoload.php");
-require_once("DepMapOutput.php");
+require_once(__DIR__ . "/DepMapOutput.php");
 
 use PhpParser\Error;
-use PhpParser\Node;
-use PhpParser\NodeDumper;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
+use RecursiveDirectoryIterator;
 
 /**
  * @var array<string> $targets ;
@@ -22,7 +20,7 @@ use PhpParser\PhpVersion;
 final class DepMap
 {
     private array $targets;
-    public DepMapOutput|null $outputType;
+    public DepMapOutput $outputType;
     public array $importMap;
     public string $outFilePath;
 
@@ -32,7 +30,7 @@ final class DepMap
     {
         $this->targets = [];
         $this->importMap = [];
-        $this->outputType = null;
+        $this->outputType = DepMapOutput::STDOUT;
         $this->phpVersion = null;
     }
 
@@ -43,10 +41,10 @@ final class DepMap
     public function addRecursiveTargets(string $path): void
     {
         if (!is_dir($path)) {
-            throw new InvalidArgumentException("{$path} is not a directory");
+            throw new InvalidArgumentException("$path is not a directory");
         }
 
-        foreach (new \RecursiveDirectoryIterator($path) as $file) {
+        foreach (new RecursiveDirectoryIterator($path) as $file) {
             if ($file->getExtension() !== "php") {
                 continue;
             }
@@ -65,7 +63,7 @@ final class DepMap
     public function addTarget(string $path): void
     {
         if (!file_exists($path)) {
-            throw new InvalidArgumentException("{$path} must be an existing file");
+            throw new InvalidArgumentException("$path must be an existing file");
         }
 
         $absPath = realpath($path);
@@ -75,31 +73,27 @@ final class DepMap
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function map(): array|false
     {
         $parser = match ($this->phpVersion) {
-            null => (new ParserFactory())->createForNewestSupportedVersion(),
+            null => (new ParserFactory())->createForHostVersion(),
             default => (new ParserFactory())->createForVersion($this->phpVersion),
         };
 
-        if ($this->outputType === null) {
-            $this->outputType = DepMapOutput::JSON;
-        }
-
 
         foreach ($this->targets as $path) {
-
+//            echo $path . PHP_EOL;
             try {
                 $data = file_get_contents($path);
                 if (!$data) {
-                    throw new \Exception("Cannot read contents of {$path}");
+                    throw new Exception("Cannot read contents of $path");
                 }
 
                 $ast = $parser->parse($data);
                 if ($ast === null) {
-                    throw new \Exception("Unable to parse the AST of{$path}");
+                    throw new Exception("Unable to parse the AST of $path");
                 }
 
                 $encoding = json_encode($ast, JSON_THROW_ON_ERROR);
@@ -107,23 +101,45 @@ final class DepMap
                 $decoded = json_decode($encoding, true, flags: JSON_THROW_ON_ERROR);
 
 
-                self::recursveArrayIter($decoded, function ($array) use ($path) {
+                self::recursiveArrayIter($decoded, function ($array) use ($path) {
                     if (isset($array['nodeType']) && $array['nodeType'] === 'Expr_Include') {
-                        // Assuming 'expr' contains the path and checking for its existence
-                        if (isset($array['expr']['value'])) {
-                            $rpath = realpath($path);
-                            $rpval = realpath($array['expr']['value']);
-                            if ($rpath && $rpval) {
-                                $this->importMap[$rpath][] = $rpval;
+//                        echo "Index: {$index} Path: {$path}" . PHP_EOL;
+//                        print_r($array);
+                        if (isset($array['expr']) && is_array($array['expr'])) {
+//                            print_r($array);
+//                            echo "=============" . PHP_EOL;
+                            $expr = $array['expr'];
+
+                            if ($expr['nodeType'] === "Expr_BinaryOp_Concat") {
+
+                                $left = $expr['left'];
+                                $right = $expr['right'];
+                                if ($left['nodeType'] === "Scalar_MagicConst_Dir" && $right['nodeType'] === 'Scalar_String') {
+                                    $parentDir = dirname(realpath($path));
+                                    $merge = join(DIRECTORY_SEPARATOR, [$parentDir, $right['value']]);
+                                    $this->importMap[realpath($path) ?: $path][] = realpath($merge) ?: $merge;
+
+                                }
+                            } else if ($expr['nodeType'] === 'Scalar_String') {
+                                $this->importMap[realpath($path) ?: $path][] = realpath($expr['value']) ?: $expr['value'];
 
                             }
+
                         }
+
                     }
                 });
 
             } catch (Error $error) {
                 echo "Parse error: {$error->getMessage()}\n";
                 return false;
+            }
+        }
+
+        foreach ($this->importMap as $key => $val) {
+            if (is_array($this->importMap[$key])) {
+                $this->importMap[$key] = array_unique($this->importMap[$key]);
+//                echo "Cleaned {$key}" . PHP_EOL;
             }
         }
 
@@ -140,11 +156,11 @@ final class DepMap
         $this->phpVersion = $version;
     }
 
-    private static function recursveArrayIter(array $array, callable $callback)
+    private static function recursiveArrayIter(array &$array, callable $callback): void
     {
         foreach ($array as $value) {
             if (is_array($value)) {
-                self::recursveArrayIter($value, $callback);
+                self::recursiveArrayIter($value, $callback);
             } else {
                 $callback($array);
             }
