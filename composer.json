@@ -21,8 +21,7 @@
         "php": ">=8.1"
     },
     "scripts": {
-        "icy": "php src/main.php",
-        "build": "php -d phar.readonly=off /home/tristan/Development/icy/vendor/bin/phar-composer build ."
+        "icy": "php src/main.php"
     },
     "require-dev": {
         "clue/phar-composer": "^1.4"

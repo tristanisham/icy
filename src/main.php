@@ -41,7 +41,7 @@ if (php_sapi_name() === "cli") {
 
                     $importMap = $dmap->map();
                     if ($dmap->outputType === \Ham\Icy\DepMapOutput::JSON) {
-                        $encoded = json_encode($importMap, JSON_PRETTY_PRINT);
+                        $encoded = json_encode($importMap, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES);
                         file_put_contents($dmap->outFilePath ?? "importMap.json", $encoded);
                     }
                 } catch (InvalidArgumentException|Exception $err) {

@@ -101,12 +101,10 @@ final class DepMap
                     throw new \Exception("Unable to parse the AST of{$path}");
                 }
 
-                $encoding = json_encode($ast);
+                $encoding = json_encode($ast, JSON_THROW_ON_ERROR);
                 // TODO: filter our imports, and append to import map with current $path as key.
-                $decoded = json_decode($encoding, true);
-                if ($decoded === false) {
-                    throw new \ErrorException("Failed to decode JSON");
-                }
+                $decoded = json_decode($encoding, true, flags: JSON_THROW_ON_ERROR);
+
 
                 self::recursveArrayIter($decoded, function ($array) use ($path) {
                     if (isset($array['nodeType']) && $array['nodeType'] === 'Expr_Include') {
