@@ -4,7 +4,6 @@
 use Tristan\Icy\Cli\RunDepMap;
 use Symfony\Component\Console\Application;
 
-require_once(__DIR__ . "/src/DepMap.php");
 
 if (isset($GLOBALS['_composer_autoload_path'])) {
     define('ICY_COMPOSER_INSTALL', $GLOBALS['_composer_autoload_path']);
@@ -22,6 +21,18 @@ if (isset($GLOBALS['_composer_autoload_path'])) {
     unset($file);
 }
 
+if (!defined('ICY_COMPOSER_INSTALL')) {
+    fwrite(
+        STDERR,
+        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
+        '    composer install' . PHP_EOL . PHP_EOL .
+        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
+    );
+
+    die(1);
+}
+
+require_once ICY_COMPOSER_INSTALL;
 
 const VERSION = "v0.0.1";
 
