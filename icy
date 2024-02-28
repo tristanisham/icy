@@ -34,7 +34,7 @@ if (!defined('ICY_COMPOSER_INSTALL')) {
 
 require_once ICY_COMPOSER_INSTALL;
 
-const VERSION = "v0.0.1";
+const VERSION = "v0.0.6";
 
 if (php_sapi_name() === "cli") {
     // https://symfony.com/doc/current/console.html#configuring-the-command
