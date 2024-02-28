@@ -11,7 +11,6 @@ if (php_sapi_name() === "cli") {
         $dmap = new Ham\Icy\DepMap();
 
         switch ($input) {
-            case "version":
             case "--version":
             case "-v":
                 echo "v0.0.1" . "\n";
