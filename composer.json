@@ -1,5 +1,5 @@
 {
-    "name": "ham/icy",
+    "name": "tristan/icy",
     "description": "A static analysis tool for PHP focused on developer experience",
     "type": "project",
     "license": "MIT",
@@ -8,7 +8,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Ham\\Icy\\": "src/"
+            "Tristan\\Icy\\": "src/"
         }
     },
     "authors": [

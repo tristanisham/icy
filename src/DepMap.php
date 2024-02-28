@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Ham\Icy;
+namespace Tristan\Icy;
 
 use InvalidArgumentException;
 use PhpParser\NodeTraverser;

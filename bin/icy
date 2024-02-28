@@ -8,7 +8,7 @@ require_once(__DIR__ . "/../src/DepMap.php");
 if (php_sapi_name() === "cli") {
     for ($i = 0; $i < $argc; $i++) {
         $input = $argv[$i];
-        $dmap = new Ham\Icy\DepMap();
+        $dmap = new Tristan\Icy\DepMap();
 
         switch ($input) {
             case "--version":
@@ -39,7 +39,7 @@ if (php_sapi_name() === "cli") {
                     }
 
                     $importMap = $dmap->map();
-                    if ($dmap->outputType === \Ham\Icy\DepMapOutput::JSON) {
+                    if ($dmap->outputType === Tristan\Icy\DepMapOutput::JSON) {
                         $encoded = json_encode($importMap, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES);
                         file_put_contents($dmap->outFilePath ?? "importMap.json", $encoded);
                     }

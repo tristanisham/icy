@@ -1,6 +1,6 @@
 <?php
 
-namespace Ham\Icy;
+namespace Tristan\Icy;
 
 enum DepMapOutput
 {
