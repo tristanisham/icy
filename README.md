@@ -6,6 +6,11 @@ the developer is very open to contributions and will respond quickly.
 
 - https://github.com/tristanisham/icy
 
+# Install
+```sh
+composer global require --dev tristan/icy
+```
+
 # Commands
 
 ## Usage:
