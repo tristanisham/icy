@@ -32,6 +32,6 @@ completion Dump the shell completion script
 help Display help for a command
 list List commands
 
-## sa
+### sa
 
 sa:gen-import-map  [sa:im] generates an import map for all PHP files in a directory.
